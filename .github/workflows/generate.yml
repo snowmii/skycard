@@ -1,4 +1,4 @@
-name: Generate themes
+name: Generate Cards
 
 on:
   schedule:
