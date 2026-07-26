@@ -84,20 +84,22 @@
     <g id="networth-section">
       <text id="networth-label" x="232" y="38" font-size="8.5" letter-spacing="2" fill="#8c8fa1" font-family="Consolas, monospace">NETWORTH</text>
 
-      <text id="networth-full" x="232" y="66" font-size="25" font-weight="700" fill="#40a02b" font-family="Consolas, monospace">Unavailable</text>
+      <text id="networth-full" x="232" y="66" font-size="25" font-weight="700" fill="#40a02b" font-family="Consolas, monospace">20,027,779,885</text>
 
-      <text id="networth-short" x="434.43" y="66" font-size="14" font-weight="700" fill="#179299" font-family="Consolas, monospace">—</text>
+      <text id="networth-short" x="452.71" y="66" font-size="14" font-weight="700" fill="#179299" font-family="Consolas, monospace">20.03B</text>
 
       <text id="wealth-summary" x="232" y="86" font-size="10" fill="#6c6f85" font-family="Consolas, monospace">
 
-        Playtime
-        <tspan id="playtime" fill="#4c4f69" font-weight="700">15,540h</tspan>
 
         Purse
         <tspan id="purse" fill="#4c4f69" font-weight="700">16,648,153</tspan>
 
         Bank
         <tspan id="bank" fill="#4c4f69" font-weight="700">1,801,699,949</tspan>
+
+        Age
+        <tspan id="playtime" fill="#4c4f69" font-weight="700">1 year 9 months</tspan>
+
       </text>
 
       <line id="networth-divider" x1="232" y1="100" x2="808" y2="100" stroke="#bcc0cc"/>
