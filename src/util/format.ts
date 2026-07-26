@@ -46,6 +46,39 @@ export function formatXp(
   return formatInteger(value);
 }
 
+export function formatProfileAge(
+  days: number,
+): string {
+  const wholeDays = Math.max(
+    0,
+    Math.floor(days),
+  );
+
+  const years = Math.floor(
+    wholeDays / 365,
+  );
+  const months = Math.floor(
+    (wholeDays % 365) / 30,
+  );
+  const remainingDays = wholeDays % 30;
+
+  if (years > 0) {
+    return months > 0
+      ? `${years} ${years === 1 ? "year" : "years"} ` +
+          `${months} ${months === 1 ? "month" : "months"}`
+      : `${years} ${years === 1 ? "year" : "years"}`;
+  }
+
+  if (months > 0) {
+    return remainingDays > 0
+      ? `${months} ${months === 1 ? "month" : "months"} ` +
+          `${remainingDays} ${remainingDays === 1 ? "day" : "days"}`
+      : `${months} ${months === 1 ? "month" : "months"}`;
+  }
+
+  return `${remainingDays} ${remainingDays === 1 ? "day" : "days"}`;
+}
+
 export function clamp01(
   value: number,
 ): number {

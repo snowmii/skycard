@@ -1,8 +1,10 @@
 # Skycard
 
-![Example](template.svg)
+![Example](https://github.com/snowmii/skycard/blob/generated/generated/card-twilight.svg)
 
 A simple skyblock stat display inspired by [github-stats](https://github.com/jstrieb/github-stats)
+
+Also comes with [catppuccin](https://github.com/catppuccin/catppuccin) flavors
 
 ## Use this as a template
 

@@ -15,6 +15,7 @@ import {
   clamp01,
   formatCompact,
   formatInteger,
+  formatProfileAge,
   formatXp,
 } from "../util/format.js";
 
@@ -228,11 +229,11 @@ export async function renderSkyBlockCard(
   setText(
     document,
     "playtime",
-    data.playtimeHours == null
+    data.profileAgeDays == null
       ? "Unavailable"
-      : `${formatInteger(
-          data.playtimeHours,
-        )}h`,
+      : formatProfileAge(
+          data.profileAgeDays,
+        ),
   );
 
   setText(

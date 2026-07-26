@@ -84,7 +84,7 @@ export interface SkyBlockCardData {
   skyblockLevelProgress: number;
 
   networth: number | null;
-  playtimeHours: number | null;
+  profileAgeDays: number | null;
 
   purse: number;
   bank: number;

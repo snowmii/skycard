@@ -9,22 +9,6 @@ function readNumber(
     : fallback;
 }
 
-function readBoolean(
-  value: string | undefined,
-  fallback: boolean,
-): boolean {
-  if (value == null) {
-    return fallback;
-  }
-
-  return [
-    "1",
-    "true",
-    "yes",
-    "on",
-  ].includes(value.toLowerCase());
-}
-
 export const config = {
   hypixelApiKey: process.env.HYPIXEL_API_KEY ?? "",
 
@@ -36,11 +20,6 @@ export const config = {
   cacheTtlMs: readNumber(
     process.env.CACHE_TTL_MS,
     300_000,
-  ),
-
-  skyCryptBrowserFallback: readBoolean(
-    process.env.SKYCRYPT_BROWSER_FALLBACK,
-    true,
   ),
 
   defaultTheme:

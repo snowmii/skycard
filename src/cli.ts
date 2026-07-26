@@ -126,3 +126,7 @@ program
   );
 
 await program.parseAsync();
+
+// Some dependencies keep background refresh handles alive after generation.
+// All output writes are complete by this point, so exit explicitly.
+process.exit(0);

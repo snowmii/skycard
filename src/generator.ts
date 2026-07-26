@@ -23,8 +23,8 @@ import {
 } from "./api/pet.js";
 
 import {
-  fetchSkyCryptSummary,
-} from "./api/skycrypt.js";
+  calculateNetworth,
+} from "./api/networth.js";
 
 import {
   config,
@@ -50,7 +50,7 @@ import {
   readActivePet,
   readPurse,
   readBank,
-  readPlaytimeHours,
+  readProfileAgeDays,
   readSelectedEmblemId,
   readSkyBlockLevel,
 } from "./skyblock/normalize.js";
@@ -146,14 +146,13 @@ export async function generateCard(
         readActivePet(member);
 
       const [
-        skyCrypt,
+        calculatedNetworth,
         skinDataUri,
         petHeadDataUri,
       ] = await Promise.all([
-        fetchSkyCryptSummary(
-          minecraft.username,
-          profile.cute_name,
-          config.skyCryptBrowserFallback,
+        calculateNetworth(
+          member,
+          profile,
         ),
 
         fetchSkinDataUri(
@@ -204,11 +203,10 @@ export async function generateCard(
           level.progress,
 
         networth:
-          skyCrypt.networth,
+          calculatedNetworth,
 
-        playtimeHours:
-          skyCrypt.playtimeHours ??
-          readPlaytimeHours(member),
+        profileAgeDays:
+          readProfileAgeDays(member),
 
         purse:
           readPurse(member),

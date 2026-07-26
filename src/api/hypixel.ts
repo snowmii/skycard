@@ -3,6 +3,10 @@ export interface HypixelProfile {
   cute_name: string;
   selected?: boolean;
 
+  banking?: {
+    balance?: number;
+  };
+
   members: Record<
     string,
     Record<string, unknown>

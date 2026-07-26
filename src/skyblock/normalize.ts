@@ -185,52 +185,17 @@ export function readSkyBlockLevel(
   };
 }
 
-export function readPlaytimeHours(
+export function readProfileAgeDays(
   member: Record<string, unknown>,
   now: number = Date.now(),
 ): number | null {
-  const hours =
-    readNumber(
-      member,
-      [
-        "player_data",
-        "playtime_hours",
-      ],
-    ) ??
-    readNumber(
-      member,
-      ["playtime_hours"],
-    );
-
-  if (hours != null) {
-    return Math.max(0, hours);
-  }
-
-  const seconds =
-    readNumber(
-      member,
-      [
-        "player_data",
-        "playtime_seconds",
-      ],
-    ) ??
-    readNumber(
-      member,
-      ["playtime_seconds"],
-    );
-
-  if (seconds != null) {
-    return Math.max(0, seconds / 3_600);
-  }
-
   const firstJoin =
     readNumber(
       member,
-      ["profile", "first_join"],
-    ) ??
-    readNumber(
-      member,
-      ["first_join"],
+      [
+        "profile",
+        "first_join",
+      ],
     );
 
   if (
@@ -240,7 +205,7 @@ export function readPlaytimeHours(
     return null;
   }
 
-  return (now - firstJoin) / 3_600_000;
+  return (now - firstJoin) / 86_400_000;
 }
 
 export function readSelectedEmblemId(
