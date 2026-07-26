@@ -28,13 +28,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Check out generated branch
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git fetch origin generated:generated || true
-          git checkout generated || git checkout -b generated
-
       - name: Generate every theme
         env:
           HYPIXEL_API_KEY: ${{ secrets.HYPIXEL_API_KEY }}
@@ -45,7 +38,20 @@ jobs:
           "$PLAYER_NAME"
           --profile "$PROFILE_NAME"
           --theme all
-          --output generated/card.svg
+          --output "$RUNNER_TEMP/skycard-generated/card.svg"
+
+      - name: Check out generated branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin generated:generated || true
+          git checkout generated || git checkout -b generated
+
+      - name: Copy generated themes
+        run: |
+          rm -rf generated
+          mkdir -p generated
+          cp "$RUNNER_TEMP/skycard-generated/"*.svg generated/
 
       - name: Commit generated themes
         run: |
