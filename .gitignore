@@ -1,0 +1,14 @@
+# Dependencies
+node_modules/
+
+# Build and generated output
+dist/
+output/
+*.tsbuildinfo
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+.codegraph/
