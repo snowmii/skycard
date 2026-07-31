@@ -1,7 +1,11 @@
-# Skycard
+<h1 align="center"> Skycard </h1>
 
-![Example](https://github.com/snowmii/skycard/blob/generated/generated/card-showcase.png)
 
+<p align="center">
+<img src=https://github.com/snowmii/skycard/blob/generated/generated/card-showcase.png>
+</p>
+
+   
 A simple skyblock stat display inspired by [github-stats](https://github.com/jstrieb/github-stats)
 
 Also comes with [catppuccin](https://github.com/catppuccin/catppuccin) flavors
