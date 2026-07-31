@@ -1,6 +1,6 @@
 # Skycard
 
-![Example](https://github.com/snowmii/skycard/blob/generated/generated/card-twilight.svg)
+![Example](https://github.com/snowmii/skycard/blob/generated/generated/card-showcase.png)
 
 A simple skyblock stat display inspired by [github-stats](https://github.com/jstrieb/github-stats)
 

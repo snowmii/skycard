@@ -41,15 +41,13 @@ jobs:
           --output "$RUNNER_TEMP/skycard-generated/card.svg"
 
       - name: Generate showcase
-        env:
-          PLAYER_NAME: ${{ vars.PLAYER_NAME }}
         run: |
           npm run showcase -- \
-            "$RUNNER_TEMP/skycard-generated/${PLAYER_NAME}-latte.svg" \
-            "$RUNNER_TEMP/skycard-generated/${PLAYER_NAME}-frappe.svg" \
-            "$RUNNER_TEMP/skycard-generated/${PLAYER_NAME}-macchiato.svg" \
-            "$RUNNER_TEMP/skycard-generated/${PLAYER_NAME}-mocha.svg" \
-            "$RUNNER_TEMP/skycard-generated/${PLAYER_NAME}-showcase.png"
+            "$RUNNER_TEMP/skycard-generated/card-latte.svg" \
+            "$RUNNER_TEMP/skycard-generated/card-frappe.svg" \
+            "$RUNNER_TEMP/skycard-generated/card-macchiato.svg" \
+            "$RUNNER_TEMP/skycard-generated/card-mocha.svg" \
+            "$RUNNER_TEMP/skycard-generated/card-showcase.png"
 
       - name: Check out generated branch
         run: |
