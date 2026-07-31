@@ -40,6 +40,17 @@ jobs:
           --theme all
           --output "$RUNNER_TEMP/skycard-generated/card.svg"
 
+      - name: Generate showcase
+        env:
+          PLAYER_NAME: ${{ vars.PLAYER_NAME }}
+        run: |
+          npm run showcase -- \
+            "$RUNNER_TEMP/skycard-generated/${PLAYER_NAME}-latte.svg" \
+            "$RUNNER_TEMP/skycard-generated/${PLAYER_NAME}-frappe.svg" \
+            "$RUNNER_TEMP/skycard-generated/${PLAYER_NAME}-macchiato.svg" \
+            "$RUNNER_TEMP/skycard-generated/${PLAYER_NAME}-mocha.svg" \
+            "$RUNNER_TEMP/skycard-generated/${PLAYER_NAME}-showcase.png"
+
       - name: Check out generated branch
         run: |
           git config user.name "github-actions[bot]"
@@ -52,6 +63,7 @@ jobs:
           rm -rf generated
           mkdir -p generated
           cp "$RUNNER_TEMP/skycard-generated/"*.svg generated/
+          cp "$RUNNER_TEMP/skycard-generated/"*.png generated/
 
       - name: Commit generated themes
         run: |
