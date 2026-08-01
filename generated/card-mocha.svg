@@ -84,15 +84,15 @@
     <g id="networth-section">
       <text id="networth-label" x="232" y="38" font-size="8.5" letter-spacing="2" fill="#bac2de" font-family="Consolas, monospace">NETWORTH</text>
 
-      <text id="networth-full" x="232" y="66" font-size="25" font-weight="700" fill="#a6e3a1" font-family="Consolas, monospace">19,725,634,235</text>
+      <text id="networth-full" x="232" y="66" font-size="25" font-weight="700" fill="#a6e3a1" font-family="Consolas, monospace">19,784,555,097</text>
 
-      <text id="networth-short" x="452.71" y="66" font-size="14" font-weight="700" fill="#94e2d5" font-family="Consolas, monospace">19.73B</text>
+      <text id="networth-short" x="452.71" y="66" font-size="14" font-weight="700" fill="#94e2d5" font-family="Consolas, monospace">19.78B</text>
 
       <text id="wealth-summary" x="232" y="86" font-size="10" fill="#a6adc8" font-family="Consolas, monospace">
 
 
         Purse
-        <tspan id="purse" fill="#cdd6f4" font-weight="700">8,357,875</tspan>
+        <tspan id="purse" fill="#cdd6f4" font-weight="700">8,360,064</tspan>
 
         Bank
         <tspan id="bank" fill="#cdd6f4" font-weight="700">1,750,000,000</tspan>
@@ -157,7 +157,7 @@
 
         <rect id="farming-progress" x="232" y="223" width="270.00" height="13" rx="3" fill="url(#gold)"/>
 
-        <text id="farming-xp" x="367" y="232.5" font-size="8.5" font-weight="700" text-anchor="middle" fill="#1e1e2e">99.87M XP</text>
+        <text id="farming-xp" x="367" y="232.5" font-size="8.5" font-weight="700" text-anchor="middle" fill="#1e1e2e">100M XP</text>
       </g>
 
       <g id="fishing-skill" font-family="Consolas, monospace">
