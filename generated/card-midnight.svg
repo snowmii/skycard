@@ -57,7 +57,7 @@
 
     <!-- PLAYER -->
     <g id="player-section">
-      <rect id="player-nametag-background" x="64.46" y="124" width="90.31" height="28" rx="2" fill="#000000" fill-opacity="0.58"/>
+      <rect id="player-nametag-background" x="64.46" y="124" width="90.31" height="28" rx="2" fill="#123445" fill-opacity="0.58"/>
 
       <text id="player-name" x="106.00" y="144" text-anchor="middle" font-family="Consolas, monospace" font-size="18" font-weight="700" letter-spacing="0.25" stroke="#183746" stroke-width="2" paint-order="stroke" fill="#63e9f2">m1uki</text>
 
@@ -84,15 +84,15 @@
     <g id="networth-section">
       <text id="networth-label" x="232" y="38" font-size="8.5" letter-spacing="2" fill="#7596a3" font-family="Consolas, monospace">NETWORTH</text>
 
-      <text id="networth-full" x="232" y="66" font-size="25" font-weight="700" fill="#8ef2c5" font-family="Consolas, monospace">19,761,601,596</text>
+      <text id="networth-full" x="232" y="66" font-size="25" font-weight="700" fill="#8ef2c5" font-family="Consolas, monospace">19,726,192,633</text>
 
-      <text id="networth-short" x="452.71" y="66" font-size="14" font-weight="700" fill="#477b67" font-family="Consolas, monospace">19.76B</text>
+      <text id="networth-short" x="452.71" y="66" font-size="14" font-weight="700" fill="#477b67" font-family="Consolas, monospace">19.73B</text>
 
       <text id="wealth-summary" x="232" y="86" font-size="10" fill="#789baa" font-family="Consolas, monospace">
 
 
         Purse
-        <tspan id="purse" fill="#e5f1f5" font-weight="700">7,544,533</tspan>
+        <tspan id="purse" fill="#e5f1f5" font-weight="700">8,915,993</tspan>
 
         Bank
         <tspan id="bank" fill="#e5f1f5" font-weight="700">1,750,000,000</tspan>
@@ -157,7 +157,7 @@
 
         <rect id="farming-progress" x="232" y="223" width="270.00" height="13" rx="3" fill="url(#gold)"/>
 
-        <text id="farming-xp" x="367" y="232.5" font-size="8.5" font-weight="700" text-anchor="middle" fill="#503600">99.36M XP</text>
+        <text id="farming-xp" x="367" y="232.5" font-size="8.5" font-weight="700" text-anchor="middle" fill="#503600">99.72M XP</text>
       </g>
 
       <g id="fishing-skill" font-family="Consolas, monospace">
@@ -247,7 +247,7 @@
 
         <text id="inferno-name" x="536" y="252" fill="#c8e0e8">Inferno</text>
 
-        <text id="inferno-level" x="808" y="252" text-anchor="end" fill="#a99fe0" font-weight="700">7 / 9</text>
+        <text id="inferno-level" x="808" y="252" text-anchor="end" fill="#c8e0e8" font-weight="700">7 / 9</text>
 
         <rect id="inferno-progress-background" x="536" y="257" width="272" height="7" rx="3" fill="#06141d"/>
 
@@ -268,7 +268,7 @@
 
     <!-- PET -->
     <g id="pet-section">
-      <rect id="pet-card" x="536" y="298" width="272" height="33" rx="4" fill="#000000" fill-opacity="0.45"/>
+      <rect id="pet-card" x="536" y="298" width="272" height="33" rx="4" fill="#123445" fill-opacity="0.45"/>
 
       <text id="active-pet-label" x="546" y="317" font-size="7.5" font-weight="700" letter-spacing="1.2" fill="#7596a3" font-family="Consolas, monospace">ACTIVE PET</text>
 
@@ -276,7 +276,7 @@
 
       <text id="pet-head-placeholder" x="632.5" y="319" text-anchor="middle" font-size="11" fill="#416878" font-family="Consolas, monospace" display="none">?</text>
 
-      <text id="pet-level" x="653" y="319" font-size="11" font-family="Consolas, monospace" fill="#9eb4bc">[Lv191]</text>
+      <text id="pet-level" x="653" y="319" font-size="11" font-family="Consolas, monospace" fill="#9eb4bc">[Lv192]</text>
 
       <text id="pet-name" x="704" y="319" font-size="11" font-family="Consolas, monospace" fill="#ffc85a">Rose Dragon</text>
     </g>
