@@ -84,18 +84,18 @@
     <g id="networth-section">
       <text id="networth-label" x="232" y="38" font-size="8.5" letter-spacing="2" fill="#8a86a8" font-family="Consolas, monospace">NETWORTH</text>
 
-      <text id="networth-full" x="232" y="66" font-size="25" font-weight="700" fill="#8df0bd" font-family="Consolas, monospace">19,784,457,682</text>
+      <text id="networth-full" x="232" y="66" font-size="25" font-weight="700" fill="#8df0bd" font-family="Consolas, monospace">19,788,252,297</text>
 
-      <text id="networth-short" x="452.71" y="66" font-size="14" font-weight="700" fill="#4f7f68" font-family="Consolas, monospace">19.78B</text>
+      <text id="networth-short" x="452.71" y="66" font-size="14" font-weight="700" fill="#4f7f68" font-family="Consolas, monospace">19.79B</text>
 
       <text id="wealth-summary" x="232" y="86" font-size="10" fill="#8a84b4" font-family="Consolas, monospace">
 
 
         Purse
-        <tspan id="purse" fill="#e8e6f2" font-weight="700">8,360,064</tspan>
+        <tspan id="purse" fill="#e8e6f2" font-weight="700">8,360,672</tspan>
 
         Bank
-        <tspan id="bank" fill="#e8e6f2" font-weight="700">1,750,000,000</tspan>
+        <tspan id="bank" fill="#e8e6f2" font-weight="700">1,750,843,520</tspan>
 
         Age
         <tspan id="playtime" fill="#e8e6f2" font-weight="700">1 year 9 months</tspan>
