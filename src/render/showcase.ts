@@ -1,4 +1,18 @@
+import "dotenv/config";
+
+import path from "node:path";
+import { access, mkdir, writeFile } from "node:fs/promises";
+
 import sharp from "sharp";
+
+import { generateCard } from "../generator.js";
+import { themes } from "../themes.js";
+
+/**
+ * The card themes blended into the showcase, lightest first so the
+ * diagonal slashes read as a light → dark sweep.
+ */
+const SHOWCASE_THEMES = ["latte", "frappe", "macchiato", "mocha"] as const;
 
 type RGB = readonly [number, number, number];
 
@@ -31,11 +45,7 @@ const SETTINGS = {
   /**
    * Slash colors between images 1–2, 2–3 and 3–4.
    */
-  glowColors: [
-    "#8ea2ff",
-    "#e8a0ff",
-    "#a9c6ff",
-  ] as const,
+  glowColors: ["#8ea2ff", "#e8a0ff", "#a9c6ff"] as const,
 
   outputScale: 1,
   svgDensity: 144,
@@ -46,15 +56,29 @@ const SETTINGS = {
   splits: [0.25, 0.5, 0.75] as const,
 };
 
+/**
+ * Path of the generated SVG card for a themed card set, matching the naming
+ * used by `npm run generate -- <username> --theme all`.
+ */
+function cardPath(dir: string, username: string, themeName: string): string {
+  return path.join(dir, `${username}-${themeName}.svg`);
+}
+
+async function fileExists(filePath: string): Promise<boolean> {
+  try {
+    await access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function smoothstep(edge0: number, edge1: number, value: number): number {
   if (edge0 === edge1) {
     return value < edge0 ? 0 : 1;
   }
 
-  const t = Math.max(
-    0,
-    Math.min(1, (value - edge0) / (edge1 - edge0)),
-  );
+  const t = Math.max(0, Math.min(1, (value - edge0) / (edge1 - edge0)));
 
   return t * t * (3 - 2 * t);
 }
@@ -116,14 +140,8 @@ async function blendImages(
 
   const output = Buffer.alloc(width * height * 4);
 
-  const {
-    diagonalShift,
-    feather,
-    splits,
-    glow,
-    glowWidth,
-    glowStrength,
-  } = SETTINGS;
+  const { diagonalShift, feather, splits, glow, glowWidth, glowStrength } =
+    SETTINGS;
 
   const glowColors = SETTINGS.glowColors.map(parseHexColor);
 
@@ -139,8 +157,7 @@ async function blendImages(
        * Subtracting the vertical contribution makes the boundary move
        * left as it travels downward, creating a "/" separator.
        */
-      const slashCoordinate =
-        normalizedX + diagonalShift * (normalizedY - 0.5);
+      const slashCoordinate = normalizedX + diagonalShift * (normalizedY - 0.5);
 
       const transition1 = smoothstep(
         splits[0] - feather,
@@ -183,31 +200,27 @@ async function blendImages(
       let alpha = 0;
 
       for (let imageIndex = 0; imageIndex < 4; imageIndex++) {
-        const image = images[imageIndex];
-        const weight = weights[imageIndex];
+        const image = images[imageIndex]!;
+        const weight = weights[imageIndex]!;
 
-        red += image[offset] * weight;
-        green += image[offset + 1] * weight;
-        blue += image[offset + 2] * weight;
-        alpha += image[offset + 3] * weight;
+        red += image[offset]! * weight;
+        green += image[offset + 1]! * weight;
+        blue += image[offset + 2]! * weight;
+        alpha += image[offset + 3]! * weight;
       }
 
       if (glow) {
         for (let splitIndex = 0; splitIndex < splits.length; splitIndex++) {
-          const distance = Math.abs(
-            slashCoordinate - splits[splitIndex],
-          );
+          const distance = Math.abs(slashCoordinate - splits[splitIndex]!);
 
           /**
            * Gaussian-shaped glow around the separator.
            */
           const intensity =
-            Math.exp(
-              -(distance * distance) /
-                (2 * glowWidth * glowWidth),
-            ) * glowStrength;
+            Math.exp(-(distance * distance) / (2 * glowWidth * glowWidth)) *
+            glowStrength;
 
-          const glowColor = glowColors[splitIndex];
+          const glowColor = glowColors[splitIndex]!;
           const visibleGlow = intensity * (alpha / 255);
 
           red = red * (1 - visibleGlow) + glowColor[0] * visibleGlow;
@@ -238,17 +251,33 @@ async function blendImages(
   console.log(`Created ${outputPath} (${width}×${height})`);
 }
 
+/**
+ * Usage: `npm run showcase <cardname> <location>`
+ *
+ *   npm run showcase m1uki output
+ *
+ * `<cardname>` is the Minecraft username, `<location>` the directory that
+ * holds (or will hold) the card set. Cards are picked up from
+ * `<location>/<cardname>-<theme>.svg`; if any of the four Catppuccin cards
+ * is missing, every theme is generated first (`--theme all` semantics).
+ * The four Catppuccin cards are then blended into
+ * `<location>/<cardname>-showcase.png`.
+ */
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
 
-  if (args.length !== 5) {
+  if (args.length !== 2) {
     console.error(
       [
         "Usage:",
-        "  npx tsx slash-blend.ts <image1> <image2> <image3> <image4> <output>",
+        "  npm run showcase <cardname> <location>",
         "",
         "Example:",
-        "  npx tsx slash-blend.ts latte.png frappe.png macchiato.png mocha.png showcase.png",
+        "  npm run showcase m1uki output",
+        "",
+        "Generates <location>/<cardname>-<theme>.svg for every theme if the",
+        "four Catppuccin cards are missing, then blends latte, frappe,",
+        "macchiato and mocha into <location>/<cardname>-showcase.png.",
       ].join("\n"),
     );
 
@@ -256,17 +285,49 @@ async function main(): Promise<void> {
     return;
   }
 
-  const [image1, image2, image3, image4, output] = args;
+  const [username = "", locationArg = ""] = args;
 
-  await blendImages(
-    [image1, image2, image3, image4],
-    output,
-  );
+  const location = path.resolve(locationArg);
+
+  const cardPaths = SHOWCASE_THEMES.map((themeName) =>
+    cardPath(location, username, themeName),
+  ) as [string, string, string, string];
+
+  const allCardsPresent = (
+    await Promise.all(
+      cardPaths.map(async (cardFilePath) => fileExists(cardFilePath)),
+    )
+  ).every(Boolean);
+
+  if (!allCardsPresent) {
+    await mkdir(location, { recursive: true });
+
+    console.log(
+      `Missing Catppuccin cards — generating ${username} for every theme…`,
+    );
+
+    for (const themeName of Object.keys(themes)) {
+      const outputPath = cardPath(location, username, themeName);
+
+      const svg = await generateCard(username, undefined, themeName);
+
+      await writeFile(outputPath, svg, "utf8");
+      console.log(`Generated ${outputPath}`);
+    }
+  } else {
+    console.log(`Using existing cards in ${location}`);
+  }
+
+  const outputPath = path.join(location, `${username}-showcase.png`);
+
+  await blendImages(cardPaths, outputPath);
+
+  // Dependencies (canvas, sharp) keep background handles alive after the
+  // image is written; exit explicitly like the CLI does.
+  process.exit(0);
 }
 
 main().catch((error: unknown) => {
-  console.error(
-    error instanceof Error ? error.message : String(error),
-  );
-  process.exitCode = 1;
+  console.error(error instanceof Error ? error.message : String(error));
+  process.exit(1);
 });

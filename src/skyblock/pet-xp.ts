@@ -1,90 +1,45 @@
-const PET_RARITY_OFFSET: Record<string, number> = {
-  COMMON: 0,
-  UNCOMMON: 6,
-  RARE: 11,
-  EPIC: 16,
-  LEGENDARY: 20,
-  MYTHIC: 20,
-};
+import petData from "../../data/pets.json" with { type: "json" };
 
-const PET_LEVEL_XP = [
-  100, 110, 120, 130, 145, 160, 175, 190, 210, 230,
-  250, 275, 300, 330, 360, 400, 440, 490, 540, 600,
-  660, 730, 800, 880, 960, 1_050, 1_150, 1_260, 1_380,
-  1_510, 1_650, 1_800, 1_960, 2_130, 2_310, 2_500,
-  2_700, 2_920, 3_160, 3_420, 3_700, 4_000, 4_350,
-  4_750, 5_200, 5_700, 6_300, 7_000, 7_800, 8_700,
-  9_700, 10_800, 12_000, 13_300, 14_700, 16_200,
-  17_800, 19_500, 21_300, 23_200, 25_200, 27_400,
-  29_800, 32_400, 35_200, 38_200, 41_400, 44_800,
-  48_400, 52_200, 56_200, 60_400, 64_800, 69_400,
-  74_200, 79_200, 84_700, 90_700, 97_200, 104_200,
-  111_700, 119_700, 128_200, 137_200, 146_700,
-  156_700, 167_700, 179_700, 192_700, 206_700,
-  221_700, 237_700, 254_700, 272_700, 291_700,
-  311_700, 333_700, 357_700, 383_700, 411_700,
-  441_700, 476_700, 516_700, 561_700, 611_700,
-  666_700, 726_700, 791_700, 861_700, 936_700,
-  1_016_700, 1_101_700, 1_191_700, 1_286_700,
-  1_386_700, 1_496_700, 1_616_700, 1_746_700,
-  1_886_700,
+/**
+ * Pet leveling data lives in `../../data/pets.json` — per-level XP costs,
+ * rarity offsets and the special level-200 extension for dragon pets.
+ */
+const LEVEL_XP: readonly number[] = petData.levelXp;
+
+const RARITY_OFFSET: Record<string, number> = petData.rarityOffset;
+
+const LEVEL_200_PETS = new Set(petData.level200.pets);
+
+const { head, perLevel, levels } = petData.level200.extensionXp;
+
+const LEVEL_200_EXTENSION_XP: readonly number[] = [
+  ...head,
+  ...Array<number>(levels).fill(perLevel),
 ];
-
-const DRAGON_LEVEL_XP = [
-  0,
-  5_555,
-  ...Array<number>(98).fill(1_886_700),
-];
-
-const LEVEL_200_PETS = new Set([
-  "GOLDEN_DRAGON",
-  "JADE_DRAGON",
-  "ROSE_DRAGON",
-]);
 
 export function calculatePetLevel(
   type: string,
   rarity: string,
   experience: number,
 ): number {
-  if (
-    type === "FRACTURED_MONTEZUMA_SOUL" ||
-    type === "MONTEZUMA"
-  ) {
+  if (type === "FRACTURED_MONTEZUMA_SOUL" || type === "MONTEZUMA") {
     return 100;
   }
 
-  const maxLevel =
-    LEVEL_200_PETS.has(type) ? 200 : 100;
+  const maxLevel = LEVEL_200_PETS.has(type) ? 200 : 100;
 
-  const rarityOffset =
-    type === "BINGO"
-      ? 0
-      : PET_RARITY_OFFSET[rarity] ?? 0;
+  const rarityOffset = type === "BINGO" ? 0 : (RARITY_OFFSET[rarity] ?? 0);
 
   const requirements =
-    maxLevel === 200
-      ? [...PET_LEVEL_XP, ...DRAGON_LEVEL_XP]
-      : PET_LEVEL_XP;
+    maxLevel === 200 ? [...LEVEL_XP, ...LEVEL_200_EXTENSION_XP] : LEVEL_XP;
 
-  let remainingExperience = Math.max(
-    0,
-    experience,
-  );
+  let remainingExperience = Math.max(0, experience);
   let level = 1;
 
-  for (
-    let index = rarityOffset;
-    level < maxLevel;
-    index += 1
-  ) {
-    const requirement =
-      requirements[index];
+  for (let index = rarityOffset; level < maxLevel; index += 1) {
+    const requirement = requirements[index];
 
-    if (
-      requirement == null ||
-      remainingExperience < requirement
-    ) {
+    if (requirement == null || remainingExperience < requirement) {
       break;
     }
 

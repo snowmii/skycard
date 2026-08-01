@@ -1,55 +1,40 @@
-export type SkillKey =
-  | "combat"
-  | "mining"
-  | "farming"
-  | "fishing"
-  | "foraging";
+export type SkillKey = "combat" | "mining" | "farming" | "fishing" | "foraging";
 
 export type SlayerKey =
-  | "revenant"
-  | "tarantula"
-  | "sven"
-  | "voidgloom"
-  | "inferno"
-  | "riftstalker";
+  "revenant" | "tarantula" | "sven" | "voidgloom" | "inferno" | "riftstalker";
 
-export type EmblemColor =
-  | "normal"
-  | "gold"
-  | "diamond"
-  | "pink"
-  | "purple";
+export type EmblemColor = "normal" | "gold" | "diamond" | "pink" | "purple";
 
 export interface PlayerEmblem {
   symbol: string;
   color: EmblemColor;
 }
 
-  export interface SkillCardData {
-    key: SkillKey;
+export interface SkillCardData {
+  key: SkillKey;
 
-    level: number;
-    maxLevel: number;
-    progress: number;
+  level: number;
+  maxLevel: number;
+  progress: number;
 
-    totalXp: number;
+  totalXp: number;
 
-    /**
-     * XP earned since reaching the current level.
-     *
-     * For a maxed skill, this is the overflow XP.
-     */
-    currentLevelXp: number;
+  /**
+   * XP earned since reaching the current level.
+   *
+   * For a maxed skill, this is the overflow XP.
+   */
+  currentLevelXp: number;
 
-    /**
-     * XP required to advance from the current level to the next.
-     * Null when the skill is maxed.
-     */
-    nextLevelXp: number | null;
+  /**
+   * XP required to advance from the current level to the next.
+   * Null when the skill is maxed.
+   */
+  nextLevelXp: number | null;
 
-    overflowXp: number;
-    isMaxed: boolean;
-  }
+  overflowXp: number;
+  isMaxed: boolean;
+}
 
 export interface SlayerCardData {
   key: SlayerKey;
@@ -77,8 +62,7 @@ export interface SkyBlockCardData {
 
   generatedAt: Date;
 
-  rankColor:
-    import("./themes.js").MinecraftColor;
+  rankColor: import("./themes.js").MinecraftColor;
 
   skyblockLevel: number;
   skyblockLevelProgress: number;

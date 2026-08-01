@@ -1,45 +1,23 @@
-import type {
-  PetCardData,
-} from "../types.js";
+import type { PetCardData } from "../types.js";
 
-import {
-  TtlCache,
-} from "../util/cache.js";
+import petData from "../../data/pets.json" with { type: "json" };
 
-const cache =
-  new TtlCache<string | null>(
-    Number(process.env.CACHE_TTL_MS) ||
-      300_000,
-  );
+import { TtlCache } from "../util/cache.js";
 
-const PET_RARITY_INDEX:
-  Record<string, number> = {
-    COMMON: 0,
-    UNCOMMON: 1,
-    RARE: 2,
-    EPIC: 3,
-    LEGENDARY: 4,
-    MYTHIC: 5,
-  };
+const cache = new TtlCache<string | null>(
+  Number(process.env.CACHE_TTL_MS) || 300_000,
+);
 
-export function fetchPetHeadDataUri(
-  pet: PetCardData,
-): Promise<string | null> {
-  const itemId =
-    pet.skin ??
-    `${pet.type};${
-      PET_RARITY_INDEX[pet.tier] ?? 0
-    }`;
+/** Rarity → NEU item id index, from `../../data/pets.json`. */
+const PET_RARITY_INDEX: Record<string, number> = petData.rarityIndex;
 
-  return cache.getOrCreate(
-    itemId,
-    () => fetchPetHead(itemId),
-  );
+export function fetchPetHeadDataUri(pet: PetCardData): Promise<string | null> {
+  const itemId = pet.skin ?? `${pet.type};${PET_RARITY_INDEX[pet.tier] ?? 0}`;
+
+  return cache.getOrCreate(itemId, () => fetchPetHead(itemId));
 }
 
-async function fetchPetHead(
-  itemId: string,
-): Promise<string | null> {
+async function fetchPetHead(itemId: string): Promise<string | null> {
   try {
     const itemResponse = await fetch(
       "https://raw.githubusercontent.com/" +
@@ -49,11 +27,9 @@ async function fetchPetHead(
       {
         headers: {
           Accept: "application/json",
-          "User-Agent":
-            "skyblock-card-generator/0.1",
+          "User-Agent": "skyblock-card-generator/0.1",
         },
-        signal:
-          AbortSignal.timeout(20_000),
+        signal: AbortSignal.timeout(20_000),
       },
     );
 
@@ -61,24 +37,18 @@ async function fetchPetHead(
       return null;
     }
 
-    const item = await itemResponse.json() as {
+    const item = (await itemResponse.json()) as {
       nbttag?: string;
     };
 
-    const encodedTexture =
-      item.nbttag?.match(
-        /Value:"([^"]+)"/,
-      )?.[1];
+    const encodedTexture = item.nbttag?.match(/Value:"([^"]+)"/)?.[1];
 
     if (!encodedTexture) {
       return null;
     }
 
     const textureData = JSON.parse(
-      Buffer.from(
-        encodedTexture,
-        "base64",
-      ).toString("utf8"),
+      Buffer.from(encodedTexture, "base64").toString("utf8"),
     ) as {
       textures?: {
         SKIN?: {
@@ -87,29 +57,22 @@ async function fetchPetHead(
       };
     };
 
-    const textureUrl =
-      textureData.textures?.SKIN?.url;
+    const textureUrl = textureData.textures?.SKIN?.url;
 
-    const textureHash =
-      textureUrl?.match(
-        /\/texture\/([a-f0-9]+)$/i,
-      )?.[1];
+    const textureHash = textureUrl?.match(/\/texture\/([a-f0-9]+)$/i)?.[1];
 
     if (!textureHash) {
       return null;
     }
 
     const headResponse = await fetch(
-      "https://mc-heads.net/head/" +
-        `${textureHash}/64`,
+      "https://mc-heads.net/head/" + `${textureHash}/64`,
       {
         headers: {
           Accept: "image/png",
-          "User-Agent":
-            "skyblock-card-generator/0.1",
+          "User-Agent": "skyblock-card-generator/0.1",
         },
-        signal:
-          AbortSignal.timeout(20_000),
+        signal: AbortSignal.timeout(20_000),
       },
     );
 
@@ -117,23 +80,17 @@ async function fetchPetHead(
       return null;
     }
 
-    const mime =
-      headResponse.headers.get(
-        "content-type",
-      ) ?? "image/png";
+    const mime = headResponse.headers.get("content-type") ?? "image/png";
 
     if (!mime.startsWith("image/")) {
       return null;
     }
 
-    const bytes = Buffer.from(
-      await headResponse.arrayBuffer(),
-    );
+    const bytes = Buffer.from(await headResponse.arrayBuffer());
 
     return bytes.length === 0
       ? null
-      : `data:${mime};base64,` +
-          bytes.toString("base64");
+      : `data:${mime};base64,` + bytes.toString("base64");
   } catch {
     return null;
   }

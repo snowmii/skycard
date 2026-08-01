@@ -28,11 +28,23 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Validate configuration
+        env:
+          HYPIXEL_API_KEY: ${{ secrets.HYPIXEL_API_KEY }}
+          PLAYER_NAME: ${{ vars.PLAYER_NAME }}
+        run: |
+          test -n "$HYPIXEL_API_KEY" \
+            || { echo "::error::Missing HYPIXEL_API_KEY repository secret."; exit 1; }
+          test -n "$PLAYER_NAME" \
+            || { echo "::error::Missing PLAYER_NAME repository variable."; exit 1; }
+
       - name: Generate every theme
         env:
           HYPIXEL_API_KEY: ${{ secrets.HYPIXEL_API_KEY }}
           PLAYER_NAME: ${{ vars.PLAYER_NAME }}
           PROFILE_NAME: ${{ vars.PROFILE_NAME }}
+        # The --output stem ("card") becomes the shared file prefix,
+        # i.e. card-<theme>.svg, matching the generated-branch naming.
         run: >-
           npm run generate --
           "$PLAYER_NAME"
@@ -43,18 +55,15 @@ jobs:
       - name: Generate showcase
         run: |
           npm run showcase -- \
-            "$RUNNER_TEMP/skycard-generated/card-latte.svg" \
-            "$RUNNER_TEMP/skycard-generated/card-frappe.svg" \
-            "$RUNNER_TEMP/skycard-generated/card-macchiato.svg" \
-            "$RUNNER_TEMP/skycard-generated/card-mocha.svg" \
-            "$RUNNER_TEMP/skycard-generated/card-showcase.png"
+            card \
+            "$RUNNER_TEMP/skycard-generated"
 
       - name: Check out generated branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git fetch origin generated:generated || true
-          git checkout generated || git checkout -b generated
+          git fetch origin generated || true
+          git checkout -B generated origin/generated || git checkout -B generated
 
       - name: Copy generated themes
         run: |
@@ -65,6 +74,12 @@ jobs:
 
       - name: Commit generated themes
         run: |
-          git add generated/
-          git commit --allow-empty -m "chore: regenerate themes"
+          # -f overrides .gitignore: generated/ is ignored on every branch,
+          # but the generated branch still needs to track these files.
+          git add -f generated/
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git commit -m "chore: regenerate themes"
           git push --set-upstream origin generated

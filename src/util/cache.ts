@@ -7,29 +7,19 @@ export class TtlCache<T> {
     }
   >();
 
-  public constructor(
-    private readonly ttlMs: number,
-  ) {}
+  public constructor(private readonly ttlMs: number) {}
 
-  public getOrCreate(
-    key: string,
-    loader: () => Promise<T>,
-  ): Promise<T> {
+  public getOrCreate(key: string, loader: () => Promise<T>): Promise<T> {
     const existing = this.values.get(key);
 
-    if (
-      existing &&
-      existing.expiresAt > Date.now()
-    ) {
+    if (existing && existing.expiresAt > Date.now()) {
       return existing.value;
     }
 
-    const value = loader().catch(
-      (error: unknown) => {
-        this.values.delete(key);
-        throw error;
-      },
-    );
+    const value = loader().catch((error: unknown) => {
+      this.values.delete(key);
+      throw error;
+    });
 
     this.values.set(key, {
       expiresAt: Date.now() + this.ttlMs,

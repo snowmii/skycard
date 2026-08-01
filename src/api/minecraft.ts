@@ -19,31 +19,24 @@ export async function resolveMinecraftProfile(
   const response = await fetch(url, {
     headers: {
       Accept: "application/json",
-      "User-Agent":
-        "skyblock-card-generator/0.1",
+      "User-Agent": "skyblock-card-generator/0.1",
     },
   });
 
   if (response.status === 404) {
-    throw new Error(
-      `Minecraft player "${username}" was not found.`,
-    );
+    throw new Error(`Minecraft player "${username}" was not found.`);
   }
 
   if (!response.ok) {
     throw new Error(
-      `Minecraft lookup failed: ` +
-      `${response.status} ${response.statusText}`,
+      `Minecraft lookup failed: ` + `${response.status} ${response.statusText}`,
     );
   }
 
-  const body =
-    await response.json() as MinecraftProfileResponse;
+  const body = (await response.json()) as MinecraftProfileResponse;
 
   if (!body.id || !body.name) {
-    throw new Error(
-      "Minecraft profile lookup returned invalid data.",
-    );
+    throw new Error("Minecraft profile lookup returned invalid data.");
   }
 
   return {

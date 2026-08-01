@@ -1,0 +1,35 @@
+{
+  "definitions": [
+    {
+      "key": "revenant",
+      "apiKey": "zombie",
+      "maxLevel": 9
+    },
+    {
+      "key": "tarantula",
+      "apiKey": "spider",
+      "maxLevel": 9
+    },
+    {
+      "key": "sven",
+      "apiKey": "wolf",
+      "maxLevel": 9
+    },
+    {
+      "key": "voidgloom",
+      "apiKey": "enderman",
+      "maxLevel": 9
+    },
+    {
+      "key": "inferno",
+      "apiKey": "blaze",
+      "maxLevel": 9
+    },
+    {
+      "key": "riftstalker",
+      "apiKey": "vampire",
+      "maxLevel": 5
+    }
+  ],
+  "xpThresholds": [0, 5, 15, 200, 1000, 5000, 20000, 100000, 400000, 1000000]
+}

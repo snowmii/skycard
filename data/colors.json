@@ -1,0 +1,69 @@
+{
+  "skyblockLevel": [
+    {
+      "minLevel": 480,
+      "color": "darkRed"
+    },
+    {
+      "minLevel": 440,
+      "color": "red"
+    },
+    {
+      "minLevel": 400,
+      "color": "gold"
+    },
+    {
+      "minLevel": 360,
+      "color": "darkPurple"
+    },
+    {
+      "minLevel": 320,
+      "color": "lightPurple"
+    },
+    {
+      "minLevel": 280,
+      "color": "blue"
+    },
+    {
+      "minLevel": 240,
+      "color": "darkAqua"
+    },
+    {
+      "minLevel": 200,
+      "color": "aqua"
+    },
+    {
+      "minLevel": 160,
+      "color": "darkGreen"
+    },
+    {
+      "minLevel": 120,
+      "color": "green"
+    },
+    {
+      "minLevel": 80,
+      "color": "yellow"
+    },
+    {
+      "minLevel": 40,
+      "color": "white"
+    },
+    {
+      "minLevel": 0,
+      "color": "gray"
+    }
+  ],
+  "rankColors": {
+    "ADMIN": "red",
+    "YOUTUBER": "red",
+    "GAME_MASTER": "darkGreen",
+    "MODERATOR": "darkGreen",
+    "HELPER": "blue",
+    "BUILD_TEAM": "darkAqua",
+    "SUPERSTAR": "gold",
+    "MVP_PLUS": "aqua",
+    "MVP": "aqua",
+    "VIP_PLUS": "green",
+    "VIP": "green"
+  }
+}

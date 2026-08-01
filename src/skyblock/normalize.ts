@@ -1,7 +1,8 @@
-import type {
-  HypixelProfile,
-  HypixelSkillResource,
-} from "../api/hypixel.js";
+import type { HypixelProfile, HypixelSkillResource } from "../api/hypixel.js";
+
+import slayerData from "../../data/slayers.json" with { type: "json" };
+
+import skillData from "../../data/skills.json" with { type: "json" };
 
 import {
   SKILL_CUMULATIVE_XP,
@@ -16,22 +17,15 @@ import type {
   SlayerKey,
 } from "../types.js";
 
-import {
-  clamp01,
-  titleCaseIdentifier,
-} from "../util/format.js";
+import { clamp01, titleCaseIdentifier } from "../util/format.js";
 
-import {
-  calculatePetLevel,
-} from "./pet-xp.js";
+import { calculatePetLevel } from "./pet-xp.js";
 
-const SKILL_KEYS: SkillKey[] = [
-  "combat",
-  "mining",
-  "farming",
-  "fishing",
-  "foraging",
-];
+/**
+ * Which skills the card shows, their default level caps, and the shared 60
+ * level ceiling all live in `../../data/skills.json`.
+ */
+const SKILL_KEYS: SkillKey[] = skillData.displayKeys as SkillKey[];
 
 interface SlayerDefinition {
   key: SlayerKey;
@@ -39,149 +33,59 @@ interface SlayerDefinition {
   maxLevel: number;
 }
 
-const SLAYERS: SlayerDefinition[] = [
-  {
-    key: "revenant",
-    apiKey: "zombie",
-    maxLevel: 9,
-  },
-  {
-    key: "tarantula",
-    apiKey: "spider",
-    maxLevel: 9,
-  },
-  {
-    key: "sven",
-    apiKey: "wolf",
-    maxLevel: 9,
-  },
-  {
-    key: "voidgloom",
-    apiKey: "enderman",
-    maxLevel: 9,
-  },
-  {
-    key: "inferno",
-    apiKey: "blaze",
-    maxLevel: 9,
-  },
-  {
-    key: "riftstalker",
-    apiKey: "vampire",
-    maxLevel: 5,
-  },
-];
+/**
+ * Slayer boss definitions and XP thresholds live in `../../data/slayers.json`.
+ */
+const SLAYERS: SlayerDefinition[] =
+  slayerData.definitions as SlayerDefinition[];
 
-const SLAYER_XP_THRESHOLDS = [
-  0,
-  5,
-  15,
-  200,
-  1_000,
-  5_000,
-  20_000,
-  100_000,
-  400_000,
-  1_000_000,
-];
+const SLAYER_XP_THRESHOLDS: readonly number[] = slayerData.xpThresholds;
 
 export function getMember(
   profile: HypixelProfile,
   uuid: string,
 ): Record<string, unknown> {
-  const normalizedUuid = uuid
-    .replaceAll("-", "")
-    .toLowerCase();
+  const normalizedUuid = uuid.replaceAll("-", "").toLowerCase();
 
-  for (
-    const [memberUuid, member]
-    of Object.entries(profile.members)
-  ) {
-    const normalizedMemberUuid =
-      memberUuid
-        .replaceAll("-", "")
-        .toLowerCase();
+  for (const [memberUuid, member] of Object.entries(profile.members)) {
+    const normalizedMemberUuid = memberUuid.replaceAll("-", "").toLowerCase();
 
-    if (
-      normalizedMemberUuid ===
-      normalizedUuid
-    ) {
+    if (normalizedMemberUuid === normalizedUuid) {
       return member;
     }
   }
 
-  throw new Error(
-    "The selected profile does not contain this player.",
-  );
+  throw new Error("The selected profile does not contain this player.");
 }
 
-export function readPurse(
-  member: Record<string, unknown>,
-): number {
+export function readPurse(member: Record<string, unknown>): number {
   return (
-    readNumber(
-      member,
-      [
-        "currencies",
-        "coin_purse",
-      ],
-    ) ??
-    readNumber(
-      member,
-      ["coin_purse"],
-    ) ??
+    readNumber(member, ["currencies", "coin_purse"]) ??
+    readNumber(member, ["coin_purse"]) ??
     0
   );
 }
 
-export function readBank(
-  member: Record<string, unknown>,
-): number {
-  return (
-    readNumber(
-      member,
-      [
-        "profile",
-        "bank_account",
-      ],
-    ) ??
-    0
-  );
+export function readBank(member: Record<string, unknown>): number {
+  return readNumber(member, ["profile", "bank_account"]) ?? 0;
 }
 
-export function readSkyBlockLevel(
-  member: Record<string, unknown>,
-): {
+export function readSkyBlockLevel(member: Record<string, unknown>): {
   level: number;
   progress: number;
 } {
   const experience =
-    readNumber(
-      member,
-      [
-        "leveling",
-        "experience",
-      ],
-    ) ??
-    readNumber(
-      member,
-      [
-        "leveling",
-        "experience_total",
-      ],
-    ) ??
+    readNumber(member, ["leveling", "experience"]) ??
+    readNumber(member, ["leveling", "experience_total"]) ??
     0;
 
-  const exactLevel =
-    experience / 100;
+  const exactLevel = experience / 100;
 
-  const level =
-    Math.floor(exactLevel);
+  const level = Math.floor(exactLevel);
 
   return {
     level,
-    progress:
-      clamp01(exactLevel - level),
+    progress: clamp01(exactLevel - level),
   };
 }
 
@@ -189,19 +93,9 @@ export function readProfileAgeDays(
   member: Record<string, unknown>,
   now: number = Date.now(),
 ): number | null {
-  const firstJoin =
-    readNumber(
-      member,
-      [
-        "profile",
-        "first_join",
-      ],
-    );
+  const firstJoin = readNumber(member, ["profile", "first_join"]);
 
-  if (
-    firstJoin == null ||
-    firstJoin > now
-  ) {
+  if (firstJoin == null || firstJoin > now) {
     return null;
   }
 
@@ -211,108 +105,56 @@ export function readProfileAgeDays(
 export function readSelectedEmblemId(
   member: Record<string, unknown>,
 ): string | null {
-  const leveling =
-    member.leveling;
+  const leveling = member.leveling;
 
-  if (
-    leveling == null ||
-    typeof leveling !== "object"
-  ) {
+  if (leveling == null || typeof leveling !== "object") {
     return null;
   }
 
-  const id =
-    (
-      leveling as Record<
-        string,
-        unknown
-      >
-    ).selected_symbol;
+  const id = (leveling as Record<string, unknown>).selected_symbol;
 
-  return typeof id === "string"
-    ? id
-    : null;
+  return typeof id === "string" ? id : null;
 }
 
 export function buildSkills(
   member: Record<string, unknown>,
-  resources: Record<
-    string,
-    HypixelSkillResource
-  >,
+  resources: Record<string, HypixelSkillResource>,
 ): SkillCardData[] {
-  return SKILL_KEYS.map(
-    (key) => {
-      const uppercase =
-        key.toUpperCase();
+  return SKILL_KEYS.map((key) => {
+    const uppercase = key.toUpperCase();
 
-      const resource =
-        resources[uppercase] ??
-        resources[`SKILL_${uppercase}`] ??
-        resources[key];
+    const resource =
+      resources[uppercase] ?? resources[`SKILL_${uppercase}`] ?? resources[key];
 
-      const totalXp =
-        readNumber(
-          member,
-          [
-            "player_data",
-            "experience",
-            `SKILL_${uppercase}`,
-          ],
-        ) ??
-        readNumber(
-          member,
-          [
-            `experience_skill_${key}`,
-          ],
-        ) ??
-        0;
+    const totalXp =
+      readNumber(member, ["player_data", "experience", `SKILL_${uppercase}`]) ??
+      readNumber(member, [`experience_skill_${key}`]) ??
+      0;
 
-      return calculateSkill(
-        key,
-        totalXp,
-        resource,
-      );
-    },
-  );
+    return calculateSkill(key, totalXp, resource);
+  });
 }
 
 function calculateSkill(
   key: SkillKey,
   totalXp: number,
-  resource:
-    | HypixelSkillResource
-    | undefined,
+  resource: HypixelSkillResource | undefined,
 ): SkillCardData {
   const maxLevel = Math.min(
-    resource?.maxLevel ??
-      getDefaultSkillCap(key),
-    60,
+    resource?.maxLevel ?? skillData.defaultCaps[key] ?? skillData.maxLevelCap,
+    skillData.maxLevelCap,
   );
 
-  const safeTotalXp = Math.max(
-    0,
-    totalXp,
-  );
+  const safeTotalXp = Math.max(0, totalXp);
 
-  const level = calculateLevelFromTotalXp(
-    safeTotalXp,
-    maxLevel,
-  );
+  const level = calculateLevelFromTotalXp(safeTotalXp, maxLevel);
 
-  const isMaxed =
-    level >= maxLevel;
+  const isMaxed = level >= maxLevel;
 
   if (isMaxed) {
-    const maxLevelCumulativeXp =
-      SKILL_CUMULATIVE_XP[maxLevel] ??
-      0;
+    const maxLevelCumulativeXp = SKILL_CUMULATIVE_XP[maxLevel] ?? 0;
 
-    const overflowXp = Math.max(
-      0,
-      safeTotalXp -
-        maxLevelCumulativeXp,
-    );
+    const overflowXp = Math.max(0, safeTotalXp - maxLevelCumulativeXp);
 
     return {
       key,
@@ -329,27 +171,15 @@ function calculateSkill(
     };
   }
 
-  const cumulativeXpAtCurrentLevel =
-    SKILL_CUMULATIVE_XP[level] ??
-    0;
+  const cumulativeXpAtCurrentLevel = SKILL_CUMULATIVE_XP[level] ?? 0;
 
-  const xpRequiredForNextLevel =
-    SKILL_XP_REQUIRED_PER_LEVEL[
-      level + 1
-    ] ?? 0;
+  const xpRequiredForNextLevel = SKILL_XP_REQUIRED_PER_LEVEL[level + 1] ?? 0;
 
-  const currentLevelXp = Math.max(
-    0,
-    safeTotalXp -
-      cumulativeXpAtCurrentLevel,
-  );
+  const currentLevelXp = Math.max(0, safeTotalXp - cumulativeXpAtCurrentLevel);
 
   const progress =
     xpRequiredForNextLevel > 0
-      ? clamp01(
-          currentLevelXp /
-            xpRequiredForNextLevel,
-        )
+      ? clamp01(currentLevelXp / xpRequiredForNextLevel)
       : 0;
 
   return {
@@ -360,26 +190,16 @@ function calculateSkill(
 
     totalXp: safeTotalXp,
     currentLevelXp,
-    nextLevelXp:
-      xpRequiredForNextLevel,
+    nextLevelXp: xpRequiredForNextLevel,
 
     overflowXp: 0,
     isMaxed: false,
   };
 }
 
-function calculateLevelFromTotalXp(
-  totalXp: number,
-  maxLevel: number,
-): number {
-  for (
-    let level = maxLevel;
-    level >= 0;
-    level -= 1
-  ) {
-    const cumulativeXp =
-      SKILL_CUMULATIVE_XP[level] ??
-      Number.POSITIVE_INFINITY;
+function calculateLevelFromTotalXp(totalXp: number, maxLevel: number): number {
+  for (let level = maxLevel; level >= 0; level -= 1) {
+    const cumulativeXp = SKILL_CUMULATIVE_XP[level] ?? Number.POSITIVE_INFINITY;
 
     if (totalXp >= cumulativeXp) {
       return level;
@@ -392,49 +212,23 @@ function calculateLevelFromTotalXp(
 export function buildSlayers(
   member: Record<string, unknown>,
 ): SlayerCardData[] {
-  return SLAYERS.map(
-    ({
+  return SLAYERS.map(({ key, apiKey, maxLevel }) => {
+    const xp =
+      readNumber(member, ["slayer", "slayer_bosses", apiKey, "xp"]) ??
+      readNumber(member, ["slayer_bosses", apiKey, "xp"]) ??
+      0;
+
+    const calculated = calculateSlayerLevel(xp, maxLevel);
+
+    return {
       key,
-      apiKey,
       maxLevel,
-    }) => {
-      const xp =
-        readNumber(
-          member,
-          [
-            "slayer",
-            "slayer_bosses",
-            apiKey,
-            "xp",
-          ],
-        ) ??
-        readNumber(
-          member,
-          [
-            "slayer_bosses",
-            apiKey,
-            "xp",
-          ],
-        ) ??
-        0;
+      xp,
 
-      const calculated =
-        calculateSlayerLevel(
-          xp,
-          maxLevel,
-        );
-
-      return {
-        key,
-        maxLevel,
-        xp,
-
-        level: calculated.level,
-        progress:
-          calculated.progress,
-      };
-    },
-  );
+      level: calculated.level,
+      progress: calculated.progress,
+    };
+  });
 }
 
 function calculateSlayerLevel(
@@ -446,39 +240,22 @@ function calculateSlayerLevel(
 } {
   let level = 0;
 
-  for (
-    let candidate = 1;
-    candidate <= maxLevel;
-    candidate += 1
-  ) {
+  for (let candidate = 1; candidate <= maxLevel; candidate += 1) {
     const threshold =
-      SLAYER_XP_THRESHOLDS[
-        candidate
-      ] ??
-      Number.POSITIVE_INFINITY;
+      SLAYER_XP_THRESHOLDS[candidate] ?? Number.POSITIVE_INFINITY;
 
     if (xp >= threshold) {
       level = candidate;
       continue;
     }
 
-    const previousThreshold =
-      SLAYER_XP_THRESHOLDS[
-        candidate - 1
-      ] ?? 0;
+    const previousThreshold = SLAYER_XP_THRESHOLDS[candidate - 1] ?? 0;
 
     return {
       level,
 
       progress: clamp01(
-        (
-          xp -
-          previousThreshold
-        ) /
-        (
-          threshold -
-          previousThreshold
-        ),
+        (xp - previousThreshold) / (threshold - previousThreshold),
       ),
     };
   }
@@ -493,84 +270,39 @@ export function readActivePet(
   member: Record<string, unknown>,
 ): PetCardData | null {
   const pets =
-    readArray(
-      member,
-      [
-        "pets_data",
-        "pets",
-      ],
-    ) ??
-    readArray(
-      member,
-      ["pets"],
-    ) ??
+    readArray(member, ["pets_data", "pets"]) ??
+    readArray(member, ["pets"]) ??
     [];
 
-  const active =
-    pets.find(
-      (candidate) =>
-        readObjectBoolean(
-          candidate,
-          "active",
-        ),
-    );
+  const active = pets.find((candidate) =>
+    readObjectBoolean(candidate, "active"),
+  );
 
-  if (
-    !active ||
-    typeof active !== "object"
-  ) {
+  if (!active || typeof active !== "object") {
     return null;
   }
 
-  const pet =
-    active as Record<string, unknown>;
+  const pet = active as Record<string, unknown>;
 
-  const type =
-    typeof pet.type === "string"
-      ? pet.type
-      : "UNKNOWN_PET";
+  const type = typeof pet.type === "string" ? pet.type : "UNKNOWN_PET";
 
-  const exp =
-    typeof pet.exp === "number"
-      ? pet.exp
-      : 0;
+  const exp = typeof pet.exp === "number" ? pet.exp : 0;
 
-  const tier =
-    typeof pet.tier === "string"
-      ? pet.tier
-      : "COMMON";
+  const tier = typeof pet.tier === "string" ? pet.tier : "COMMON";
 
   const level =
     typeof pet.level === "number"
       ? Math.floor(pet.level)
-      : calculatePetLevel(
-          type,
-          tier,
-          exp,
-        );
+      : calculatePetLevel(type, tier, exp);
 
   return {
     level,
-    name:
-      titleCaseIdentifier(type),
+    name: titleCaseIdentifier(type),
     type,
     tier,
-    skin:
-      typeof pet.skin === "string"
-        ? pet.skin
-        : null,
+    skin: typeof pet.skin === "string" ? pet.skin : null,
     headDataUri: null,
   };
-}
-
-function getDefaultSkillCap(
-  key: SkillKey,
-): number {
-  if (key === "fishing") {
-    return 50;
-  }
-
-  return 60;
 }
 
 function readNumber(
@@ -580,26 +312,14 @@ function readNumber(
   let current: unknown = source;
 
   for (const segment of path) {
-    if (
-      current == null ||
-      typeof current !== "object"
-    ) {
+    if (current == null || typeof current !== "object") {
       return null;
     }
 
-    current =
-      (
-        current as Record<
-          string,
-          unknown
-        >
-      )[segment];
+    current = (current as Record<string, unknown>)[segment];
   }
 
-  return (
-    typeof current === "number" &&
-    Number.isFinite(current)
-  )
+  return typeof current === "number" && Number.isFinite(current)
     ? current
     : null;
 }
@@ -611,44 +331,20 @@ function readArray(
   let current: unknown = source;
 
   for (const segment of path) {
-    if (
-      current == null ||
-      typeof current !== "object"
-    ) {
+    if (current == null || typeof current !== "object") {
       return null;
     }
 
-    current =
-      (
-        current as Record<
-          string,
-          unknown
-        >
-      )[segment];
+    current = (current as Record<string, unknown>)[segment];
   }
 
-  return Array.isArray(current)
-    ? current
-    : null;
+  return Array.isArray(current) ? current : null;
 }
 
-function readObjectBoolean(
-  value: unknown,
-  key: string,
-): boolean {
-  if (
-    value == null ||
-    typeof value !== "object"
-  ) {
+function readObjectBoolean(value: unknown, key: string): boolean {
+  if (value == null || typeof value !== "object") {
     return false;
   }
 
-  return Boolean(
-    (
-      value as Record<
-        string,
-        unknown
-      >
-    )[key],
-  );
+  return Boolean((value as Record<string, unknown>)[key]);
 }

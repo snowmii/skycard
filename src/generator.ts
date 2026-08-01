@@ -1,47 +1,25 @@
 import path from "node:path";
 import { writeFile } from "node:fs/promises";
 
-import {
-  fileURLToPath,
-} from "node:url";
+import { fileURLToPath } from "node:url";
 
-import {
-  HypixelClient,
-  selectProfile,
-} from "./api/hypixel.js";
+import { HypixelClient, selectProfile } from "./api/hypixel.js";
 
-import {
-  resolveMinecraftProfile,
-} from "./api/minecraft.js";
+import { resolveMinecraftProfile } from "./api/minecraft.js";
 
-import {
-  fetchSkinDataUri,
-} from "./api/skin.js";
+import { fetchSkinDataUri } from "./api/skin.js";
 
-import {
-  fetchPetHeadDataUri,
-} from "./api/pet.js";
+import { fetchPetHeadDataUri } from "./api/pet.js";
 
-import {
-  calculateNetworth,
-} from "./api/networth.js";
+import { calculateNetworth } from "./api/networth.js";
 
-import {
-  config,
-} from "./config.js";
+import { config } from "./config.js";
 
-import {
-  loadEmblem,
-} from "./emblems.js";
+import { loadEmblem } from "./emblems.js";
 
-import {
-  renderSkyBlockCard,
-} from "./render/svg.js";
+import { renderSkyBlockCard } from "./render/svg.js";
 
-import {
-  getHypixelRankColor,
-  resolveTheme,
-} from "./themes.js";
+import { getHypixelRankColor, resolveTheme } from "./themes.js";
 
 import {
   buildSkills,
@@ -55,195 +33,105 @@ import {
   readSkyBlockLevel,
 } from "./skyblock/normalize.js";
 
-import type {
-  SkyBlockCardData,
-} from "./types.js";
+import type { SkyBlockCardData } from "./types.js";
 
-import {
-  TtlCache,
-} from "./util/cache.js";
+import { TtlCache } from "./util/cache.js";
 
-const currentDirectory =
-  path.dirname(
-    fileURLToPath(import.meta.url),
-  );
+const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
 
-const templatePath =
-  path.resolve(
-    currentDirectory,
-    "../template.svg",
-  );
+const templatePath = path.resolve(currentDirectory, "../template.svg");
 
-const emblemMapPath =
-  path.resolve(
-    currentDirectory,
-    "../src/emblems.json",
-  );
-
-const cardCache =
-  new TtlCache<SkyBlockCardData>(
-    config.cacheTtlMs,
-  );
+const cardCache = new TtlCache<SkyBlockCardData>(config.cacheTtlMs);
 
 export async function generateCard(
   username: string,
   profileName?: string,
   themeName: string = config.defaultTheme,
 ): Promise<string> {
-  const resolvedTheme =
-    resolveTheme(themeName);
+  const resolvedTheme = resolveTheme(themeName);
 
   const cacheKey =
-    `${username.toLowerCase()}:` +
-    (
-      profileName?.toLowerCase() ??
-      "selected"
+    `${username.toLowerCase()}:` + (profileName?.toLowerCase() ?? "selected");
+
+  const cardData = await cardCache.getOrCreate(cacheKey, async () => {
+    const minecraft = await resolveMinecraftProfile(username);
+
+    const hypixel = new HypixelClient(config.hypixelApiKey);
+
+    const [profiles, skillResources, player] = await Promise.all([
+      hypixel.getProfiles(minecraft.uuid),
+
+      hypixel.getSkillResources(),
+
+      hypixel.getPlayer(minecraft.uuid),
+    ]);
+
+    const profile = selectProfile(profiles, profileName);
+
+    const member = getMember(profile, minecraft.uuid);
+
+    const activePet = readActivePet(member);
+
+    const [calculatedNetworth, skinDataUri, petHeadDataUri] = await Promise.all(
+      [
+        calculateNetworth(member, profile),
+
+        fetchSkinDataUri(minecraft.uuid, minecraft.username),
+
+        activePet ? fetchPetHeadDataUri(activePet) : Promise.resolve(null),
+      ],
     );
 
-  const cardData =
-    await cardCache.getOrCreate(
-    cacheKey,
-    async () => {
-      const minecraft =
-        await resolveMinecraftProfile(
-          username,
-        );
+    const level = readSkyBlockLevel(member);
 
-      const hypixel =
-        new HypixelClient(
-          config.hypixelApiKey,
-        );
+    const emblem = loadEmblem(readSelectedEmblemId(member));
 
-      const [
-        profiles,
-        skillResources,
-        player,
-      ] = await Promise.all([
-        hypixel.getProfiles(
-          minecraft.uuid,
-        ),
+    const cardData: SkyBlockCardData = {
+      username: minecraft.username,
 
-        hypixel.getSkillResources(),
+      uuid: minecraft.uuid,
 
-        hypixel.getPlayer(
-          minecraft.uuid,
-        ),
-      ]);
+      profileName: profile.cute_name,
 
-      const profile =
-        selectProfile(
-          profiles,
-          profileName,
-        );
+      profileUrl:
+        "cupcake.shiiyu.moe/stats/" +
+        `${minecraft.username}/` +
+        profile.cute_name,
 
-      const member =
-        getMember(
-          profile,
-          minecraft.uuid,
-        );
+      generatedAt: new Date(),
 
-      const activePet =
-        readActivePet(member);
+      rankColor: getHypixelRankColor(player),
 
-      const [
-        calculatedNetworth,
-        skinDataUri,
-        petHeadDataUri,
-      ] = await Promise.all([
-        calculateNetworth(
-          member,
-          profile,
-        ),
+      skyblockLevel: level.level,
 
-        fetchSkinDataUri(
-          minecraft.uuid,
-          minecraft.username,
-        ),
+      skyblockLevelProgress: level.progress,
 
-        activePet
-          ? fetchPetHeadDataUri(activePet)
-          : Promise.resolve(null),
-      ]);
+      networth: calculatedNetworth,
 
-      const level =
-        readSkyBlockLevel(member);
+      profileAgeDays: readProfileAgeDays(member),
 
-      const emblem =
-        await loadEmblem(
-          emblemMapPath,
-          readSelectedEmblemId(member),
-        );
+      purse: readPurse(member),
 
-      const cardData:
-        SkyBlockCardData = {
-        username:
-          minecraft.username,
+      bank: readBank(member),
 
-        uuid:
-          minecraft.uuid,
+      skills: buildSkills(member, skillResources),
 
-        profileName:
-          profile.cute_name,
+      slayers: buildSlayers(member),
 
-        profileUrl:
-          "cupcake.shiiyu.moe/stats/" +
-          `${minecraft.username}/` +
-          profile.cute_name,
+      activePet: activePet
+        ? {
+            ...activePet,
+            headDataUri: petHeadDataUri,
+          }
+        : null,
 
-        generatedAt:
-          new Date(),
+      emblem,
 
-        rankColor:
-          getHypixelRankColor(player),
+      skinDataUri,
+    };
 
-        skyblockLevel:
-          level.level,
+    return cardData;
+  });
 
-        skyblockLevelProgress:
-          level.progress,
-
-        networth:
-          calculatedNetworth,
-
-        profileAgeDays:
-          readProfileAgeDays(member),
-
-        purse:
-          readPurse(member),
-
-        bank:
-          readBank(member),
-
-        skills:
-          buildSkills(
-            member,
-            skillResources,
-          ),
-
-        slayers:
-          buildSlayers(member),
-
-        activePet:
-          activePet
-            ? {
-                ...activePet,
-                headDataUri:
-                  petHeadDataUri,
-              }
-            : null,
-
-        emblem,
-
-        skinDataUri,
-      };
-
-      return cardData;
-    },
-  );
-
-  return renderSkyBlockCard(
-    cardData,
-    templatePath,
-    resolvedTheme.theme,
-  );
+  return renderSkyBlockCard(cardData, templatePath, resolvedTheme.theme);
 }

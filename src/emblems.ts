@@ -1,52 +1,30 @@
-import {
-  readFile,
-} from "node:fs/promises";
+import emblemsJson from "../data/emblems.json" with { type: "json" };
 
-import type {
-  EmblemColor,
-  PlayerEmblem,
-} from "./types.js";
+import type { EmblemColor, PlayerEmblem } from "./types.js";
 
-type EmblemMap =
-  Record<string, PlayerEmblem>;
+const EMBLEM_COLORS = new Set<EmblemColor>([
+  "normal",
+  "gold",
+  "diamond",
+  "pink",
+  "purple",
+]);
 
-const EMBLEM_COLORS =
-  new Set<EmblemColor>([
-    "normal",
-    "gold",
-    "diamond",
-    "pink",
-    "purple",
-  ]);
+/**
+ * Emblem symbols live in `../data/emblems.json` — a plain map of
+ * Hypixel profile emblem ids to `{ symbol, color }` entries.
+ */
+const EMBLEM_MAP = emblemsJson as Record<
+  string,
+  { symbol: string; color: string }
+>;
 
-export async function loadEmblem(
-  mapPath: string,
-  id: string | null,
-): Promise<PlayerEmblem | null> {
+export function loadEmblem(id: string | null): PlayerEmblem | null {
   if (!id) {
     return null;
   }
 
-  const source = await readFile(
-    mapPath,
-    "utf8",
-  );
-
-  const parsed =
-    JSON.parse(source) as unknown;
-
-  if (
-    parsed == null ||
-    typeof parsed !== "object" ||
-    Array.isArray(parsed)
-  ) {
-    throw new Error(
-      "The emblem map must be a JSON object.",
-    );
-  }
-
-  const value =
-    (parsed as EmblemMap)[id];
+  const value = EMBLEM_MAP[id];
 
   if (!value) {
     return null;
@@ -54,12 +32,13 @@ export async function loadEmblem(
 
   if (
     typeof value.symbol !== "string" ||
-    !EMBLEM_COLORS.has(value.color)
+    !EMBLEM_COLORS.has(value.color as EmblemColor)
   ) {
-    throw new Error(
-      `Invalid emblem map entry: ${id}`,
-    );
+    throw new Error(`Invalid emblem map entry: ${id}`);
   }
 
-  return value;
+  return {
+    symbol: value.symbol,
+    color: value.color as EmblemColor,
+  };
 }
