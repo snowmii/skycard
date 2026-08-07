@@ -84,15 +84,15 @@
     <g id="networth-section">
       <text id="networth-label" x="232" y="38" font-size="8.5" letter-spacing="2" fill="#8a86a8" font-family="Consolas, monospace">NETWORTH</text>
 
-      <text id="networth-full" x="232" y="66" font-size="25" font-weight="700" fill="#8df0bd" font-family="Consolas, monospace">19,416,711,617</text>
+      <text id="networth-full" x="232" y="66" font-size="25" font-weight="700" fill="#8df0bd" font-family="Consolas, monospace">19,387,876,739</text>
 
-      <text id="networth-short" x="452.71" y="66" font-size="14" font-weight="700" fill="#4f7f68" font-family="Consolas, monospace">19.42B</text>
+      <text id="networth-short" x="452.71" y="66" font-size="14" font-weight="700" fill="#4f7f68" font-family="Consolas, monospace">19.39B</text>
 
       <text id="wealth-summary" x="232" y="86" font-size="10" fill="#8a84b4" font-family="Consolas, monospace">
 
 
         Purse
-        <tspan id="purse" fill="#e8e6f2" font-weight="700">116,459</tspan>
+        <tspan id="purse" fill="#e8e6f2" font-weight="700">122,119</tspan>
 
         Bank
         <tspan id="bank" fill="#e8e6f2" font-weight="700">1,750,843,521</tspan>
@@ -191,7 +191,7 @@
 
         <rect id="foraging-progress" x="232" y="299" width="270.00" height="13" rx="3" fill="url(#gold)"/>
 
-        <text id="foraging-xp" x="367" y="308.5" font-size="8.5" font-weight="700" text-anchor="middle" fill="#4a3200">10.59M XP</text>
+        <text id="foraging-xp" x="367" y="308.5" font-size="8.5" font-weight="700" text-anchor="middle" fill="#4a3200">10.69M XP</text>
       </g>
     </g>
 
