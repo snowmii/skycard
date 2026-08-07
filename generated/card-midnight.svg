@@ -84,7 +84,7 @@
     <g id="networth-section">
       <text id="networth-label" x="232" y="38" font-size="8.5" letter-spacing="2" fill="#7596a3" font-family="Consolas, monospace">NETWORTH</text>
 
-      <text id="networth-full" x="232" y="66" font-size="25" font-weight="700" fill="#8ef2c5" font-family="Consolas, monospace">19,420,815,100</text>
+      <text id="networth-full" x="232" y="66" font-size="25" font-weight="700" fill="#8ef2c5" font-family="Consolas, monospace">19,416,711,617</text>
 
       <text id="networth-short" x="452.71" y="66" font-size="14" font-weight="700" fill="#477b67" font-family="Consolas, monospace">19.42B</text>
 
@@ -92,7 +92,7 @@
 
 
         Purse
-        <tspan id="purse" fill="#e5f1f5" font-weight="700">109,391</tspan>
+        <tspan id="purse" fill="#e5f1f5" font-weight="700">116,459</tspan>
 
         Bank
         <tspan id="bank" fill="#e5f1f5" font-weight="700">1,750,843,521</tspan>
