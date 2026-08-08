@@ -84,7 +84,7 @@
     <g id="networth-section">
       <text id="networth-label" x="232" y="38" font-size="8.5" letter-spacing="2" fill="#7596a3" font-family="Consolas, monospace">NETWORTH</text>
 
-      <text id="networth-full" x="232" y="66" font-size="25" font-weight="700" fill="#8ef2c5" font-family="Consolas, monospace">19,450,886,236</text>
+      <text id="networth-full" x="232" y="66" font-size="25" font-weight="700" fill="#8ef2c5" font-family="Consolas, monospace">19,452,440,274</text>
 
       <text id="networth-short" x="452.71" y="66" font-size="14" font-weight="700" fill="#477b67" font-family="Consolas, monospace">19.45B</text>
 
