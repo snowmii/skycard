@@ -84,9 +84,9 @@
     <g id="networth-section">
       <text id="networth-label" x="232" y="38" font-size="8.5" letter-spacing="2" fill="#8a86a8" font-family="Consolas, monospace">NETWORTH</text>
 
-      <text id="networth-full" x="232" y="66" font-size="25" font-weight="700" fill="#8df0bd" font-family="Consolas, monospace">19,807,080,387</text>
+      <text id="networth-full" x="232" y="66" font-size="25" font-weight="700" fill="#8df0bd" font-family="Consolas, monospace">19,796,257,483</text>
 
-      <text id="networth-short" x="452.71" y="66" font-size="14" font-weight="700" fill="#4f7f68" font-family="Consolas, monospace">19.81B</text>
+      <text id="networth-short" x="452.71" y="66" font-size="14" font-weight="700" fill="#4f7f68" font-family="Consolas, monospace">19.8B</text>
 
       <text id="wealth-summary" x="232" y="86" font-size="10" fill="#8a84b4" font-family="Consolas, monospace">
 
@@ -98,7 +98,7 @@
         <tspan id="bank" fill="#e8e6f2" font-weight="700">1,750,000,001</tspan>
 
         Age
-        <tspan id="playtime" fill="#e8e6f2" font-weight="700">1 year 9 months</tspan>
+        <tspan id="playtime" fill="#e8e6f2" font-weight="700">1 year 10 months</tspan>
 
       </text>
 
